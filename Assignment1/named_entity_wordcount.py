@@ -96,9 +96,9 @@ def main():
     if end_pos != -1:
         text = text[:end_pos]
 
-    # CRITICAL: 200 partitions keeps the data chunks tiny
+    # capping the number of lines to 1000 to prevent RAM explosion
     lines = text.splitlines()[:1000]
-    text_rdd = sc.parallelize(lines, numSlices=4)
+    text_rdd = sc.parallelize(lines, numSlices=4) # 4 partitions to prevent RAM explosion
 
     print("Spark partitions:", text_rdd.getNumPartitions())
     print("\nExtracting named entities (This will take a few minutes)...")
