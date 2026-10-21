@@ -1,0 +1,3 @@
+#code to remove .env files from git tracking
+.env
+.vscode/
