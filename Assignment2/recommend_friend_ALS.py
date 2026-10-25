@@ -30,23 +30,44 @@ def main():
     if not os.path.exists(LOCAL):
         urllib.request.urlretrieve(URL, LOCAL)
 
-    spark = SparkSession.builder.appName("FriendRecommendationALS").getOrCreate()
+    #spark = SparkSession.builder.appName("FriendRecommendationALS").getOrCreate()
+    spark = (
+    SparkSession.builder
+    .appName("FriendRecommendationALS")
+    .master("local[*]")
+    .config("spark.driver.host", "127.0.0.1")
+    .config("spark.driver.bindAddress", "127.0.0.1")
+    .getOrCreate()
+)
     spark.sparkContext.setLogLevel("WARN")
 
     #Load + symmetrize edges
-    raw = spark.read.text("file://" + os.path.abspath(LOCAL))
+    #raw = spark.read.text("file://" + os.path.abspath(LOCAL))
+    raw = spark.read.text(os.path.abspath(LOCAL))
     parts = F.split(F.col("value"), "\t")
-    pairs = (raw.select(parts.getItem(0).cast("int").alias("u"),
+    pairs = (raw.select(parts.getItem(0).alias("u"),
                         F.explode(F.split(parts.getItem(1), ",")).alias("f"))
-                .withColumn("f", F.col("f").cast("int"))
+                .select(F.expr("try_cast(trim(u) as int)").alias("u"),
+                        F.expr("try_cast(trim(f) as int)").alias("f"))
                 .dropna())
     edges = (pairs.union(pairs.select(F.col("f").alias("u"), F.col("u").alias("f")))
-             .distint()
+             .distinct()
              .cache())
 
     #Same random 10 users as the MapReduce script like same seed and method
     keys = edges.select("u").distinct().rdd.map(lambda r: r[0]).collect()
-    sample = random.Random(seed).sample(sorted(key), SAMPLE_SIZE)
+    sample = random.Random(seed).sample(sorted(keys), SAMPLE_SIZE)
+    # pairs = (raw.select(parts.getItem(0).cast("int").alias("u"),
+    #                     F.explode(F.split(parts.getItem(1), ",")).alias("f"))
+    #             .withColumn("f", F.col("f").cast("int"))
+    #             .dropna())
+    # edges = (pairs.union(pairs.select(F.col("f").alias("u"), F.col("u").alias("f")))
+    #          .distinct()
+    #          .cache())
+
+    # #Same random 10 users as the MapReduce script like same seed and method
+    # keys = edges.select("u").distinct().rdd.map(lambda r: r[0]).collect()
+    # sample = random.Random(seed).sample(sorted(keys), SAMPLE_SIZE)
     del keys
 
     #Candidate universe = sampled users + friends + friends-of-friends
@@ -87,13 +108,7 @@ def main():
     ratings = pos.union(neg).cache()
     print("nodes=%d, positives=%d negatives=%d" % (n_nodes, pos.count(), neg.count()))
 
-    train, test = ratings.randomsplit([0.8, 0.2], seed)
-
-    #Pipeline: [user indexer, item indexer, ALS]
-    #Both indexers share ONE vocabulary (all nodes) so user #k and item #k are the
-    #same person. Fitting two StringIndexers separately (or inside CV folds) could silently
-    # give different mappings for the two columns.
-
+    train, test = ratings.randomSplit([0.8, 0.2], seed=seed)
     labels = [str(n) for n in node_ids] #index i <-> node_ids[i]
     user_idx = StringIndexerModel.from_labels(labels, inputCol="user", outputCol="userIdx")
     item_idx = StringIndexerModel.from_labels(labels, inputCol="item", outputCol="itemIdx")
