@@ -57,17 +57,6 @@ def main():
     #Same random 10 users as the MapReduce script like same seed and method
     keys = edges.select("u").distinct().rdd.map(lambda r: r[0]).collect()
     sample = random.Random(seed).sample(sorted(keys), SAMPLE_SIZE)
-    # pairs = (raw.select(parts.getItem(0).cast("int").alias("u"),
-    #                     F.explode(F.split(parts.getItem(1), ",")).alias("f"))
-    #             .withColumn("f", F.col("f").cast("int"))
-    #             .dropna())
-    # edges = (pairs.union(pairs.select(F.col("f").alias("u"), F.col("u").alias("f")))
-    #          .distinct()
-    #          .cache())
-
-    # #Same random 10 users as the MapReduce script like same seed and method
-    # keys = edges.select("u").distinct().rdd.map(lambda r: r[0]).collect()
-    # sample = random.Random(seed).sample(sorted(keys), SAMPLE_SIZE)
     del keys
 
     #Candidate universe = sampled users + friends + friends-of-friends
