@@ -40,7 +40,7 @@ def main():
     sc = spark.sparkContext
 
     #Build symmetric adjacency lists
-    raw = sc.textFile("file://" + os.path.abspath(LOCAL))
+    raw = sc.textFile("file:///" + os.path.abspath(LOCAL))
     adj = (raw.map(parse)
            .filter(lambda r: r is not None)
            .flatMap(both_directions)

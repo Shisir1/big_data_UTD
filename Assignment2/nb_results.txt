@@ -1,0 +1,49 @@
+=== Naive Bayes (multinomial, from scratch on Spark RDDs) ===
+seed=42  train docs=15011  test docs=3799  vocab=31903  alpha=1.00  min_count=3
+
+class                            docs      prior
+alt.atheism                       613    0.04084
+comp.graphics                     782    0.05210
+comp.os.ms-windows.misc           783    0.05216
+comp.sys.ibm.pc.hardware          783    0.05216
+comp.sys.mac.hardware             766    0.05103
+comp.windows.x                    795    0.05296
+misc.forsale                      788    0.05249
+rec.autos                         799    0.05323
+rec.motorcycles                   781    0.05203
+rec.sport.baseball                774    0.05156
+rec.sport.hockey                  787    0.05243
+sci.crypt                         782    0.05210
+sci.electronics                   815    0.05429
+sci.med                           792    0.05276
+sci.space                         804    0.05356
+soc.religion.christian            769    0.05123
+talk.politics.guns                731    0.04870
+talk.politics.mideast             737    0.04910
+talk.politics.misc                631    0.04204
+talk.religion.misc                499    0.03324
+
+class                        precision    recall        f1  support
+alt.atheism                     0.8020    0.8541    0.8272      185
+comp.graphics                   0.6794    0.7553    0.7154      188
+comp.os.ms-windows.misc         0.9151    0.4924    0.6403      197
+comp.sys.ibm.pc.hardware        0.6379    0.7908    0.7062      196
+comp.sys.mac.hardware           0.7794    0.8238    0.8010      193
+comp.windows.x                  0.7560    0.8272    0.7900      191
+misc.forsale                    0.8671    0.6966    0.7726      178
+rec.autos                       0.8657    0.9206    0.8923      189
+rec.motorcycles                 0.8755    0.9533    0.9128      214
+rec.sport.baseball              0.9171    0.9087    0.9128      219
+rec.sport.hockey                0.9336    0.9336    0.9336      211
+sci.crypt                       0.9126    0.8995    0.9060      209
+sci.electronics                 0.8000    0.7574    0.7781      169
+sci.med                         0.8794    0.8929    0.8861      196
+sci.space                       0.9261    0.8956    0.9106      182
+soc.religion.christian          0.8207    0.9035    0.8601      228
+talk.politics.guns              0.7700    0.9162    0.8367      179
+talk.politics.mideast           0.9167    0.8670    0.8911      203
+talk.politics.misc              0.7419    0.8042    0.7718      143
+talk.religion.misc              0.8649    0.4961    0.6305      129
+
+ACCURACY = 0.8281  (3146 / 3799)
+Macro-F1 = 0.8188
